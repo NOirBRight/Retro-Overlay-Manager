@@ -1,1 +1,21 @@
+Retro Overlay Manager
+====================
 
+A lightweight, static front-end for browsing and managing bezel overlays by console family. The demo stores overlays locally in your browser; wire it to your own backend for real persistence.
+
+Features
+--------
+- Upload overlay images, tag multiple supported systems (e.g., SNES, N64), and note expected aspect ratios.
+- Filter, search, sort, and multi-select overlays for bulk download, deletion, or compatibility updates.
+- Edit overlay names/descriptions after upload and seed demo data to explore the UI quickly.
+
+Getting started
+---------------
+1. Open `index.html` in your browser.
+2. Add an overlay with the form, or click **Load demo overlays** to populate sample entries.
+3. Filter by system or search text to find overlays; use selection mode for bulk download/edit/delete and edit single items directly from each card.
+
+Notes
+-----
+- Files are encoded to Data URLs and saved in `localStorage` for this demo implementation.
+- Hook form submission and deletion handlers to your API to persist overlays on the server.
