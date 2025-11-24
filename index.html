@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Retro Overlay Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="logo">Retro Overlay Manager</div>
+    <div class="subtitle">Upload, browse, and manage overlays for your favorite emulators.</div>
+  </header>
+
+  <main class="page">
+    <section class="panel">
+      <header class="panel__header">
+        <div>
+          <div class="eyebrow">Create</div>
+          <h1 class="panel__title">Add overlay</h1>
+          <p class="panel__description">Attach overlay files, add screenshots, and categorize by emulator.</p>
+        </div>
+        <button type="button" id="seed-button" class="ghost-button">Load demo overlays</button>
+      </header>
+
+      <form id="overlay-form" class="form">
+        <div class="form__grid">
+          <label class="form__field">
+            <span>Overlay name</span>
+            <input required name="name" type="text" placeholder="e.g. Street Fighter II scanlines" />
+          </label>
+
+          <label class="form__field">
+            <span>Emulator</span>
+            <select required name="emulator">
+              <option value="">Choose emulator</option>
+              <option>RetroArch</option>
+              <option>DuckStation</option>
+              <option>PCSX2</option>
+              <option>Dolphin</option>
+              <option>BSNES</option>
+              <option>MAME</option>
+              <option>PPSSPP</option>
+              <option>Other</option>
+            </select>
+          </label>
+
+          <label class="form__field">
+            <span>Overlay file (.cfg, .zip, .json)</span>
+            <input required name="overlayFile" type="file" accept=".cfg,.zip,.json,.ini" />
+          </label>
+
+          <label class="form__field">
+            <span>Screenshot (optional)</span>
+            <input name="previewFile" type="file" accept="image/*" />
+          </label>
+        </div>
+
+        <label class="form__field">
+          <span>Description</span>
+          <textarea name="description" rows="3" placeholder="Notes about bezel size, input hints, shader compatibility..." required></textarea>
+        </label>
+
+        <div class="form__footer">
+          <button type="submit" class="primary-button">Save overlay</button>
+          <p class="hint">Files are stored locally in your browser for this demo. Hook up your API to persist them remotely.</p>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <header class="panel__header">
+        <div>
+          <div class="eyebrow">Browse</div>
+          <h2 class="panel__title">Overlay library</h2>
+          <p class="panel__description">Filter by emulator, search titles and descriptions, and download files.</p>
+        </div>
+        <div class="filter-row">
+          <label class="chip-select">
+            <span>Emulator</span>
+            <select id="filter-emulator">
+              <option value="all">All</option>
+              <option>RetroArch</option>
+              <option>DuckStation</option>
+              <option>PCSX2</option>
+              <option>Dolphin</option>
+              <option>BSNES</option>
+              <option>MAME</option>
+              <option>PPSSPP</option>
+              <option>Other</option>
+            </select>
+          </label>
+
+          <label class="chip-select">
+            <span>Search</span>
+            <input type="search" id="filter-search" placeholder="Find overlays" />
+          </label>
+
+          <label class="chip-select">
+            <span>Sort</span>
+            <select id="filter-sort">
+              <option value="newest">Newest</option>
+              <option value="alphabetical">A → Z</option>
+            </select>
+          </label>
+        </div>
+      </header>
+
+      <div id="overlay-grid" class="overlay-grid" aria-live="polite"></div>
+      <p id="empty-state" class="empty-state">No overlays yet. Add one above or load a demo set.</p>
+    </section>
+  </main>
+
+  <template id="overlay-card-template">
+    <article class="overlay-card">
+      <div class="overlay-card__thumb">
+        <img alt="Overlay screenshot" />
+        <div class="overlay-card__emulator"></div>
+      </div>
+      <div class="overlay-card__body">
+        <div class="overlay-card__title-row">
+          <h3 class="overlay-card__title"></h3>
+          <span class="badge" data-badge="new">NEW</span>
+        </div>
+        <p class="overlay-card__description"></p>
+        <div class="overlay-card__meta"></div>
+        <div class="overlay-card__actions">
+          <button class="ghost-button" data-action="download">Download</button>
+          <button class="ghost-button" data-action="delete">Delete</button>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <footer class="app-footer">Build a backend to replace the local storage mock, then deploy anywhere static hosting works.</footer>
+  <script src="app.js"></script>
+</body>
+</html>

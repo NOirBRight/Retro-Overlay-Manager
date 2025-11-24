@@ -1,1 +1,21 @@
+Retro Overlay Manager
+====================
 
+A lightweight, static front-end for browsing and managing emulator overlays. The demo stores overlays locally in your browser; wire it to your own backend for real persistence.
+
+Features
+--------
+- Upload overlay files and optional screenshots, organized by emulator.
+- Filter, search, and sort overlays in the library grid.
+- Local demo data seeding to explore the UI quickly.
+
+Getting started
+---------------
+1. Open `index.html` in your browser.
+2. Add an overlay with the form, or click **Load demo overlays** to populate sample entries.
+3. Filter by emulator or search text to find overlays; download or delete items directly from each card.
+
+Notes
+-----
+- Files are encoded to Data URLs and saved in `localStorage` for this demo implementation.
+- Hook form submission and deletion handlers to your API to persist overlays on the server.
