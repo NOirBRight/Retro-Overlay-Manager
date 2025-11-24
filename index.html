@@ -12,7 +12,7 @@
 <body>
   <header class="app-header">
     <div class="logo">Retro Overlay Manager</div>
-    <div class="subtitle">Upload, browse, and manage bezel overlays by console family.</div>
+    <div class="subtitle">Upload, browse, and manage overlays for your favorite emulators.</div>
   </header>
 
   <main class="page">
@@ -21,7 +21,7 @@
         <div>
           <div class="eyebrow">Create</div>
           <h1 class="panel__title">Add overlay</h1>
-          <p class="panel__description">Upload overlay images, mark supported systems, and keep everything organized.</p>
+          <p class="panel__description">Attach overlay files, add screenshots, and categorize by emulator.</p>
         </div>
         <button type="button" id="seed-button" class="ghost-button">Load demo overlays</button>
       </header>
@@ -33,18 +33,28 @@
             <input required name="name" type="text" placeholder="e.g. Street Fighter II scanlines" />
           </label>
 
-          <fieldset class="form__field">
-            <legend>Supported systems (multi-select)</legend>
-            <div id="machine-options" class="chip-list"></div>
-          </fieldset>
-
           <label class="form__field">
-            <span>Overlay image (.png, .jpg)</span>
-            <input required name="overlayFile" type="file" accept="image/*" />
+            <span>Emulator</span>
+            <select required name="emulator">
+              <option value="">Choose emulator</option>
+              <option>RetroArch</option>
+              <option>DuckStation</option>
+              <option>PCSX2</option>
+              <option>Dolphin</option>
+              <option>BSNES</option>
+              <option>MAME</option>
+              <option>PPSSPP</option>
+              <option>Other</option>
+            </select>
           </label>
 
           <label class="form__field">
-            <span>Alternative preview (optional)</span>
+            <span>Overlay file (.cfg, .zip, .json)</span>
+            <input required name="overlayFile" type="file" accept=".cfg,.zip,.json,.ini" />
+          </label>
+
+          <label class="form__field">
+            <span>Screenshot (optional)</span>
             <input name="previewFile" type="file" accept="image/*" />
           </label>
         </div>
@@ -66,13 +76,21 @@
         <div>
           <div class="eyebrow">Browse</div>
           <h2 class="panel__title">Overlay library</h2>
-          <p class="panel__description">Filter by system, search titles and descriptions, and download files.</p>
+          <p class="panel__description">Filter by emulator, search titles and descriptions, and download files.</p>
         </div>
         <div class="filter-row">
           <label class="chip-select">
-            <span>System</span>
-            <select id="filter-machine">
+            <span>Emulator</span>
+            <select id="filter-emulator">
               <option value="all">All</option>
+              <option>RetroArch</option>
+              <option>DuckStation</option>
+              <option>PCSX2</option>
+              <option>Dolphin</option>
+              <option>BSNES</option>
+              <option>MAME</option>
+              <option>PPSSPP</option>
+              <option>Other</option>
             </select>
           </label>
 
@@ -89,15 +107,6 @@
             </select>
           </label>
         </div>
-        <div class="selection-row" id="bulk-actions" hidden>
-          <div class="selection-row__summary"><span id="selection-count">0</span> selected</div>
-          <div class="selection-row__actions">
-            <button type="button" class="ghost-button" id="bulk-download">Download selected</button>
-            <button type="button" class="ghost-button" id="bulk-edit">Edit properties</button>
-            <button type="button" class="ghost-button" id="bulk-delete">Delete</button>
-            <button type="button" class="ghost-button" id="bulk-clear">Clear selection</button>
-          </div>
-        </div>
       </header>
 
       <div id="overlay-grid" class="overlay-grid" aria-live="polite"></div>
@@ -107,10 +116,6 @@
 
   <template id="overlay-card-template">
     <article class="overlay-card">
-      <label class="select-box">
-        <input type="checkbox" data-select />
-        <span></span>
-      </label>
       <div class="overlay-card__thumb">
         <img alt="Overlay screenshot" />
         <div class="overlay-card__emulator"></div>
@@ -122,65 +127,15 @@
         </div>
         <p class="overlay-card__description"></p>
         <div class="overlay-card__meta"></div>
-        <div class="machine-tags"></div>
         <div class="overlay-card__actions">
           <button class="ghost-button" data-action="download">Download</button>
-          <button class="ghost-button" data-action="edit">Edit</button>
           <button class="ghost-button" data-action="delete">Delete</button>
         </div>
       </div>
     </article>
   </template>
 
-  <dialog id="edit-dialog" class="dialog">
-    <form method="dialog" class="dialog__panel" id="edit-form">
-      <header class="dialog__header">
-        <h3 id="edit-title">Edit overlay</h3>
-        <button type="button" class="ghost-button" data-close>Close</button>
-      </header>
-      <label class="form__field">
-        <span>Name</span>
-        <input required name="name" type="text" />
-      </label>
-      <label class="form__field">
-        <span>Description</span>
-        <textarea name="description" rows="3" required></textarea>
-      </label>
-      <fieldset class="form__field">
-        <legend>Supported systems</legend>
-        <div id="edit-machine-options" class="chip-list"></div>
-      </fieldset>
-      <menu class="dialog__footer">
-        <button class="ghost-button" value="cancel" data-close>Cancel</button>
-        <button class="primary-button" value="confirm">Save changes</button>
-      </menu>
-    </form>
-  </dialog>
-
-  <dialog id="bulk-dialog" class="dialog">
-    <form method="dialog" class="dialog__panel" id="bulk-form">
-      <header class="dialog__header">
-        <h3>Bulk edit selected</h3>
-        <button type="button" class="ghost-button" data-close>Close</button>
-      </header>
-      <p class="panel__description">Update compatible systems and optionally rename all selected overlays.</p>
-      <label class="form__field">
-        <span>New name for selected (optional)</span>
-        <input name="name" type="text" placeholder="Leave blank to keep names" />
-      </label>
-      <fieldset class="form__field">
-        <legend>Supported systems</legend>
-        <div id="bulk-machine-options" class="chip-list"></div>
-      </fieldset>
-      <menu class="dialog__footer">
-        <button class="ghost-button" value="cancel" data-close>Cancel</button>
-        <button class="primary-button" value="confirm">Apply changes</button>
-      </menu>
-    </form>
-  </dialog>
-
   <footer class="app-footer">Build a backend to replace the local storage mock, then deploy anywhere static hosting works.</footer>
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
