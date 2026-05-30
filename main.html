@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Overlay 预览</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+          sans-serif;
+        background: #111;
+        color: #f4f4f4;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      header {
+        padding: 1.5rem 2rem;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(1.5rem, 2vw, 2.5rem);
+        letter-spacing: 0.05em;
+      }
+
+      #gallery {
+        flex: 1;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+        padding: 2rem;
+      }
+
+      figure {
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        max-width: min(600px, 90vw);
+      }
+
+      img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 12px;
+        box-shadow: 0 15px 45px rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      figcaption {
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.85);
+      }
+
+      #status {
+        text-align: center;
+        padding: 2rem;
+        font-size: 1.1rem;
+        color: rgba(255, 255, 255, 0.7);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Overlays 图像预览</h1>
+      <p>自动读取 overlays 目录中的所有图片并居中显示。</p>
+    </header>
+    <main id="gallery" aria-live="polite"></main>
+    <div id="status" hidden>正在加载 overlays 目录中的图片…</div>
+
+    <script>
+      const gallery = document.getElementById('gallery');
+      const statusEl = document.getElementById('status');
+      const imagePattern = /\.(png|jpe?g|gif|webp|svg)$/i;
+
+      function setStatus(message, hidden = false) {
+        statusEl.textContent = message;
+        statusEl.hidden = hidden;
+      }
+
+      async function loadOverlayImages() {
+        try {
+          setStatus('正在读取 overlays 目录…');
+          const response = await fetch('overlays/');
+
+          if (!response.ok) {
+            throw new Error(`无法读取 overlays 目录: ${response.status}`);
+          }
+
+          const html = await response.text();
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const links = Array.from(doc.querySelectorAll('a'));
+          const imageLinks = links
+            .map((link) => link.getAttribute('href') || '')
+            .filter((href) => imagePattern.test(href))
+            .map((href) => href.replace(/^\.\//, ''));
+
+          if (!imageLinks.length) {
+            setStatus('overlays 目录中尚未放置任何图片。', false);
+            return;
+          }
+
+          gallery.innerHTML = '';
+          imageLinks.forEach((fileName) => {
+            const figure = document.createElement('figure');
+
+            const img = document.createElement('img');
+            img.src = `overlays/${fileName}`;
+            img.alt = fileName;
+
+            const caption = document.createElement('figcaption');
+            caption.textContent = fileName;
+
+            figure.appendChild(img);
+            figure.appendChild(caption);
+            gallery.appendChild(figure);
+          });
+
+          setStatus('', true);
+        } catch (error) {
+          console.error(error);
+          setStatus('读取 overlays 目录失败，请确保在服务器环境下访问此页面。');
+        }
+      }
+
+      loadOverlayImages();
+    </script>
+  </body>
+</html>
